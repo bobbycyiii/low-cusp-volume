@@ -1,4 +1,4 @@
-from enuminternals.enuminternals import enumerate_internal_necklaces
+from enuminternals import enumerate_internal_necklaces
 from gordon.superexceptional import *
 from snappy import *
 from time import process_time

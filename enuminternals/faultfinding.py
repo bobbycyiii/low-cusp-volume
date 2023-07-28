@@ -1,10 +1,20 @@
 import regina
-from enuminternals.t2i import is_T2xI
+from .t2i import is_T2xI
        
 def is_nonseparating_fault(surf):
     T = surf.cutAlong()
     isFault = surf.eulerChar() >= 0
-    return T.isConnected() and isFault
+    return (T.isConnected() and
+            surf.isCompact() and
+            isFault)
+
+def is_nonseparating_closed_fault(surf):
+    isClosed = not surf.hasRealBoundary()
+    return isClosed and is_nonseparating_fault(surf)
+
+def is_nonseparating_nonclosed_fault(surf):
+    isNotClosed = surf.hasRealBoundary()
+    return isNotClosed and is_nonseparating_fault(surf)
 
 def is_sphere(surf):
     return (surf.isConnected()
@@ -13,9 +23,7 @@ def is_sphere(surf):
 
 def unsum(sphere):
     T = sphere.cutAlong()
-    T.splitIntoComponents()
-    L = T.firstChild()
-    R = L.nextSibling()
+    L, R = T.triangulateComponents()
     L.finiteToIdeal()
     L.intelligentSimplify()
     L.idealToFinite()
@@ -24,7 +32,7 @@ def unsum(sphere):
     R.intelligentSimplify()
     R.idealToFinite()
     R.intelligentSimplify()
-    return (L.isoSig(),R.isoSig())
+    return (L.isoSig(), R.isoSig())
 
 def is_essential_sphere(surf):
     if not is_sphere(surf):
@@ -32,7 +40,7 @@ def is_essential_sphere(surf):
     T = surf.cutAlong()
     if T.isConnected():
         return True
-    (Lsig,Rsig) = unsum(surf)
+    Lsig, Rsig = unsum(surf)
     L = regina.Triangulation3(Lsig)
     R = regina.Triangulation3(Rsig)
     if L.isThreeSphere() or R.isThreeSphere():
@@ -51,9 +59,7 @@ def is_torus_fault(surf):
     T.intelligentSimplify()
     if T.isConnected():
         return True
-    T.splitIntoComponents()
-    L = T.firstChild()
-    R = L.nextSibling()
+    L, R = T.triangulateComponents()
     if (L.hasCompressingDisc() or is_T2xI(L)
         or R.hasCompressingDisc() or is_T2xI(R)):
         return False
@@ -71,9 +77,7 @@ def is_solid_torus_annulus(surf):
     T.intelligentSimplify()
     if T.isConnected():
         return False
-    T.splitIntoComponents()
-    L = T.firstChild()
-    R = L.nextSibling()
+    L, R = T.triangulateComponents()
     if L.isSolidTorus() and R.isSolidTorus():
         return True
     return False

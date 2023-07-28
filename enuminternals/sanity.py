@@ -17,6 +17,18 @@ def is_nontrivial_link_exterior(mfld):
     else:
         return True
 
+def is_closed_oriented(mfld):
+    M = regina.Triangulation3(mfld)
+    M.idealToFinite()
+    M.intelligentSimplify()
+    if not M.isConnected():
+        return False
+    if not M.isOrientable():
+        return False
+    if M.countBoundaryComponents() > 0:
+        return False
+    return True
+
 def is_common_axis_commutator(expr):
     l = expr.terms()
     if (len(l) != 4

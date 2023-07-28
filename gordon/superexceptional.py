@@ -2,7 +2,7 @@
 # then determines which among these manifolds is in fact superexceptional.
 
 import snappy
-from gordon.hyperbolicity import *
+from .hyperbolicity import *
 
 def find_superexceptional_fillings(name, verbose=False):
     supers = set()

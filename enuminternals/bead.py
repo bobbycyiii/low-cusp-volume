@@ -26,7 +26,6 @@ def make_necklace(match):
             me.join(me_face,you,regina.Perm4(2,3))
         else:
             me.join(me_face,you,regina.Perm4(0,1))
-    ndipyr.setLabel(str(match))
     return ndipyr
 
 def smush(l,m):
