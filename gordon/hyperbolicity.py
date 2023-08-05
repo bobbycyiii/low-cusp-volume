@@ -37,7 +37,7 @@ def hyp_regina(given_sig):
         return (True, s)
 
     # We use the material triangulation M for the surface enumeration.
-    nsl = regina.NormalSurfaces.enumerate
+    nsl = regina.NormalSurfaces
     qvs = nsl(M, regina.NS_QUAD, regina.NS_VERTEX)
     # The literature only guarantees existence results for fundamental surfaces.
     # Happily, for our data set, vertex surfaces alone turn out to suffice.
@@ -134,24 +134,32 @@ def hyp_snappy(snappy_mfld, verbose=False):
     return (None, '')
 
 def hyp_census(sig):
-    # The following code works for Regina versions 5.1.
+    # The following code works for Regina version 7.3.
     # The user will have to modify it appropriately for different versions.
     # It may be that census naming conventions could change.
     
     vs = regina.versionString()
     # String literals are automatically in Unicode in Python3.
-    if not (vs == '5.1' or vs == '5.2'): # As of 2020-09-04, sageDocker has 5.2 installed
+    if not (vs == '7.3'): # As of 2023-07-31 sagedocker has version 7.3 installed.
         raise Exception("Unknown version of Regina")
-    hit = regina.Census.lookup(sig).first()
-    if hit != None:
+    hits = regina.Census.lookup(sig)
+    for hit in hits: 
         name = hit.name()
         print("hyp_census: {0} {1}".format(sig, name))
         if name[0:3] == 'Hyp':
+            # A hyperbolic manifold from the closed orientable census.
             return (True, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "0123456789":
-            # This is a closed hyperbolic census manifold.
+        if name[0] in "0123456789" and name[1] == '.':
+            # This is a manifold from the closed hyperbolic census.
             # Its name begins with its volume estimate.
             return (True, "hyp_census: {0}: {1}".format(sig,name))
+        if name[0] in "msvt" or name[0:2] == "o9":
+            # This is a manifold from the cusped orientable hyperbolic census.
+            return (True, "hyp_census: {0}: {1}".format(sig,name))
+        if name[0] in "0123456789" and name.split('a')[1][0] == 'h': 
+            # This is a hyperbolic manifold from the prime knot census.
+            return (True, "hyp_census: {0}: {1}".format(sig,name))
+            
         if name[0:2] == 'L(':
             # A lens space.
             return (False, "hyp_census: {0}: {1}".format(sig,name))
@@ -165,15 +173,17 @@ def hyp_census(sig):
             return (False, "hyp_census: {0}: {1}".format(sig,name))
         if name[0:7] == "S2 x S1":
             return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "msvt" or name[0:2] == "o9":
-            # This is a SnapPea census manifold.
-            return (True, "hyp_census: {0}: {1}".format(sig,name))
+        if name[0] in "0123456789" and name.split('a')[1][0] != 'h':
+            # This is a nonhyperbolic manifold from the prime knot census.
+            return (False, "hyp_census: {0}: {1}".format(sig,name))
         if name[0] == 'L' and name[1] in "123456789":
-            # In the Regina knot and link census.
-            # In version 5.1, this census has nonhyperbolic and hyperbolic elements.
+            # In the Christy knot and link census.
+            # This census has both nonhyperbolic and hyperbolic elements.
             # For instance, L108019 is a Seifert-fibered space.
-            return (None, "hyp_census: {0}: {1}".format(sig,name))
+            continue 
+
         raise Exception("hyp_census: {0}: new name type: " + name)
+
     return (None, "hyp_census: " + sig)
 
 def generate_sigs(snappy_mfld, fuel, verbose=False):

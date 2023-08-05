@@ -43,7 +43,7 @@ def is_essential_sphere(surf):
     Lsig, Rsig = unsum(surf)
     L = regina.Triangulation3(Lsig)
     R = regina.Triangulation3(Rsig)
-    if L.isThreeSphere() or R.isThreeSphere():
+    if L.isSphere() or R.isSphere():
         return False
     return True
 
@@ -64,6 +64,13 @@ def is_torus_fault(surf):
         or R.hasCompressingDisc() or is_T2xI(R)):
         return False
     return True
+
+def is_mobius_band(surf):
+    return (surf.isConnected()
+            and surf.isCompact()
+            and not surf.isOrientable()
+            and surf.hasRealBoundary()
+            and surf.eulerChar() == 0)
 
 def is_solid_torus_annulus(surf):
     is_annulus = (surf.isConnected()

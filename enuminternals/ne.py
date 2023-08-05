@@ -17,6 +17,7 @@ def solve_problem_ne(mfld, verbose=False):
     which mfld embeds nonelementarily."""
     assert is_nontrivial_link_exterior(mfld) or is_closed_oriented(mfld)
     sig = mfld.isoSig()
+
     if has_common_axis_obstruction(mfld):
         # No nonelementary embeddings.
         if verbose:
@@ -25,6 +26,7 @@ def solve_problem_ne(mfld, verbose=False):
     mu = regina.Triangulation3(sig)
     mu.finiteToIdeal()
     mu.intelligentSimplify()
+
     if mu.hasStrictAngleStructure():
         if verbose:
             print("ne: {0}: strict angle structure".format(sig))
@@ -49,8 +51,10 @@ def solve_problem_ne(mfld, verbose=False):
     musigs.sort()
     M = regina.Triangulation3(musigs[0][1])
     material_sig = M.isoSig()
-    nsl = regina.NormalSurfaces.enumerate
+    nsl = regina.NormalSurfaces
+
     F = nsl(M, regina.NS_QUAD, regina.NS_VERTEX)
+
     idx = find_from(is_nonseparating_closed_fault, F)
     if idx != None:
         if verbose:
@@ -59,6 +63,7 @@ def solve_problem_ne(mfld, verbose=False):
         return set()
     if verbose:
         print("no nonsep in {}".format(material_sig))
+
     idx = find_from(is_essential_sphere, F)
     if idx != None:
         S = F.surface(idx)
@@ -73,6 +78,14 @@ def solve_problem_ne(mfld, verbose=False):
         return solve_problem_ne(L).union(solve_problem_ne(R))
     if verbose:
         print("{} is irreducible".format(material_sig))
+
+    # M is irreducible since it has no essential sphere in F.
+    # So M has a nonseparating disc if and only if it is a solid torus.
+    # We use the built-in Regina function for this instead of looking in F.
+
+    if M.isSolidTorus():
+        return set() 
+
     idx = find_from(is_torus_fault, F)
     if idx != None:
         S = F.surface(idx)
@@ -85,6 +98,21 @@ def solve_problem_ne(mfld, verbose=False):
         return solve_problem_ne(L).union(solve_problem_ne(R))
     if verbose:
         print("{} is atoroidal".format(material_sig))
+
+    idx = find_from(is_mobius_band, F)
+    if idx != None:
+        if verbose:
+            s = "ne: {0} homeo. {1}: M2 at index {2} in {1}"
+            print(s.format(sig, material_sig, idx))
+
+    # At this point, the only possible nonseparating nonclosed fault is an annulus. 
+    idx = find_from(is_nonseparating_nonclosed_fault, F)
+    if idx != None:
+        if verbose:
+            s = "ne: {0} homeo. {1}: nonseparating A2 at index {2} in {1}"
+            print(s.format(sig, material_sig, idx))
+        return set()
+
     idx = find_from(is_solid_torus_annulus, F)
     if idx != None:
         if verbose:
@@ -93,17 +121,10 @@ def solve_problem_ne(mfld, verbose=False):
         return set()
     if verbose:
         print("{} is not two solid tori".format(material_sig))
-    # If we are here, then the manifold is either faultness or
-    # only contains non-separating faults with boundary.
-    # In particular the manifold must be either
-    # faultless or Seifert fibred
-    idx = find_from(is_nonseparating_nonclosed_fault, F)
-    if idx != None:
-        if verbose:
-            s = "ne: {0} homeo. {1}: only nonsep. nonclosed, e.g. index {2} in {1}"
-            print(s.format(sig, material_sig,idx))
-        return set()
-    # Manifold must be faultless
+
+    # Manifold is faultless
+    # If the manifold has boundary, it must be hyperbolic.
+    # However, this function permits closed inputs.
     if verbose:
         print("ne: {0} homeo. {1}: faultless".format(sig, material_sig))
     return set([mfld.isoSig()])
