@@ -4,6 +4,7 @@ from snappy.verify.exceptions import ShapePositiveImaginaryPartNumericalVerifyEr
 from gordon.hyperbolicity import hyp_info
 from regina import Triangulation3
 from enuminternals.ne import solve_problem_ne
+from sage.rings.real_mpfi import RealIntervalField 
 import sys
 
 def length_upper_bound_Futer_Kalfagianni_Purcell(mfld, vol_upper_bound):
@@ -28,8 +29,12 @@ def fkp_slopes(name, cusp, volume_bound, verbose=False):
 if __name__ == "__main__":
     verbose = True
 
-    # One cusped manifolds with volume at most 3.07
-    one_cusped_volume_bound = 3.07
+    # One cusped manifolds with volume at most 2.62 * 2 * v3 / sqrt(3)
+    # Note, 3269644116 / 2**30 ~ 3.070518 is a close lower bound of this number.
+    # It is bigger than 3.07.
+
+    RR = RealIntervalField(212)
+    one_cusped_volume_bound = RR(3296944116) / RR(2**30)
     one_cusped_list = ['m003', 'm004', 'm006', 'm007', 'm009', 'm010', 'm011', \
                        'm015', 'm016', 'm017', 'm019', 'm022', 'm023', 'm026']
 
@@ -94,7 +99,7 @@ if __name__ == "__main__":
         
     if "closed" in sys.argv: # not elif
     # Closed manifolds with volume at most 3.07/3.02
-        drilling_constant = 3.02
+        drilling_constant = RR(3.0177)
         # From Lemma 3.1 of "Dehn surgery, homology and hyperbolic volume,"
         # by I. Agol, M. Culler, and P. Shalen,
         # at [AGT 6 (2006) 2297–2312](https://msp.org/agt/2006/6-5/p10.xhtml),
@@ -149,7 +154,7 @@ if __name__ == "__main__":
             if not (datum[0] > closed_volume_bound):
                 print(datum)
 
-        verified = [(N_name, N_slope) for (v, N_name, N_slope) in closed_fillings if v.upper() < closed_volume_bound]
+        verified = [(N_name, N_slope) for (v, N_name, N_slope) in closed_fillings if v < closed_volume_bound]
         print(verified)
         assert verified == [('m003', (-3,1)), ('m003', (2,1)), ('m003', (-2,3)), ('m003', (-1,3)), ('m004', (-5,1)), ('m004', (5,1))]
         fmw = ManifoldHP('m003(-3,1)')
@@ -172,7 +177,7 @@ if __name__ == "__main__":
             N = ManifoldHP(N_name)
             N.dehn_fill(N_slope, 0)
             for (X_vol, X_name, X_slope) in closed_fillings:
-                if abs(X_vol-N_vol) < 0.0001:
+                if abs(X_vol-N_vol) < RR(0.0001):
                     X = ManifoldHP(X_name)
                     X.dehn_fill(X_slope, 0)
                     try:
@@ -190,7 +195,7 @@ if __name__ == "__main__":
             print("{0}{1} still failed".format(N_name, N_slope))
 
         failures = [('m007', (3,1)), ('m010', (-1,2)), ('m007', (3,2)), ('m006', (4,1)), ('m022', (-1,2))]
-        assert [(N_name, N_slope) for (N_vol, N_name, N_slope) in still_failed] == failures
+        assert set([(N_name, N_slope) for (N_vol, N_name, N_slope) in still_failed]) == set(failures)
 
         print("\nm007(3,1) is Vol3 by definition.")
         Vol3 = ManifoldHP('m007(3,1)')

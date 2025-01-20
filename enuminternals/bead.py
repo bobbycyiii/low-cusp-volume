@@ -35,8 +35,8 @@ def smush(l,m):
         L.append(M.pop())
     return L
 
-def for_all_perfect_matchings(p,l,m,f):
-    pfm = for_all_perfect_matchings
+def old_for_all_perfect_matchings(p,l,m,f):
+    pfm = old_for_all_perfect_matchings
     if l == []:
         if m == []:
             f(p)
@@ -45,6 +45,20 @@ def for_all_perfect_matchings(p,l,m,f):
         x0, x1, l2 = l[-1], l[-2], l[:-2]
         pfm(p+[(x0,x1)], smush(l2,m), [], f)
         pfm(p, l2+[x0], m+[x1], f)
+
+def for_all_perfect_matchings(p,l,m,f):
+    pfm = for_all_perfect_matchings
+    rv = lambda x: list(reversed(x))
+    x,y = l[-1], l[-2]
+    if len(l) == 2:
+        if m == []:
+            f(p + [(x,y)])
+        else:
+            pfm(p + [(x,y)], rv(m), [], f)
+    else:
+        pfm(p, l[:-2] + [x], m + [y], f)
+        pfm(p + [(x,y)], rv(m) + l[:-2], [], f)
+            
     
 def enumerate_isosigs(n):
     labels = list(range(2*n))
