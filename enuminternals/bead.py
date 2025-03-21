@@ -68,3 +68,17 @@ def enumerate_isosigs(n):
         sigs[mfld.isoSig()] = p
     for_all_perfect_matchings([],labels,[],put_in_sigs)
     return sigs
+
+import sys
+import json
+if __name__ == """__main__""":
+    n = int(sys.argv[1])
+    sigs = enumerate_isosigs(n)
+    l = list(sigs)
+    l.sort()
+    fn = sys.argv[2]
+    with open(fn, 'w', encoding='utf-8') as f:
+        for sig in l:
+            f.write(sig + "\n")
+
+

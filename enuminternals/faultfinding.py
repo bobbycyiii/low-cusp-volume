@@ -57,11 +57,12 @@ def is_torus_fault(surf):
         return False
     T = surf.cutAlong()
     T.intelligentSimplify()
+    if T.hasCompressingDisc():
+        return False
     if T.isConnected():
         return True
     L, R = T.triangulateComponents()
-    if (L.hasCompressingDisc() or is_T2xI(L)
-        or R.hasCompressingDisc() or is_T2xI(R)):
+    if is_T2xI(L) or is_T2xI(R):
         return False
     return True
 

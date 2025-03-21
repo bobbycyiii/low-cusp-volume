@@ -1,7 +1,7 @@
 import regina
 import snappy
 from enuminternals.faultfinding import *
-from enuminternals.sanity import *
+from enuminternals.quick_checks import *
 from enuminternals.ne import find_from
 
 def hyp_regina(given_sig):

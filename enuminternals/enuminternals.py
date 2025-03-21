@@ -1,18 +1,18 @@
 import regina
 import sys
 from .faultfinding import *
-from .sanity import *
+from .quick_checks import *
 from .bead import *
 from .ne import *
 
-def enumerate_internal_necklaces(bead, verbose=False):
+def enumerate_internal_necklaces(bead, verbose=True):
     neckl_sigs = {}
     if verbose:
         print("We abbreviate enumerate_internal_necklaces to e_i_n.")
         print("e_i_n, {0} beads: Enumerating isosigs...".format(bead))
     match_sigs = enumerate_isosigs(bead)
     if verbose:
-        print("e_i_n, {0} beads: Running basic sanity checks...".format(bead))
+        print("e_i_n, {0} beads: Running quick checks...".format(bead))
     for match_sig in match_sigs:
         mfld = regina.Triangulation3(match_sig)
         mfld.intelligentSimplify()
