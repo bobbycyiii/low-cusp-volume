@@ -143,48 +143,57 @@ def hyp_census(sig):
     if not (vs == '7.3'): # As of 2023-07-31 sagedocker has version 7.3 installed.
         raise Exception("Unknown version of Regina")
     hits = regina.Census.lookup(sig)
+    x = (None, "hyp_census: " + sig)
     for hit in hits: 
         name = hit.name()
-        print("hyp_census: {0} {1}".format(sig, name))
         if name[0:3] == 'Hyp':
             # A hyperbolic manifold from the closed orientable census.
-            return (True, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "0123456789" and name[1] == '.':
+            x = (True, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0] in "0123456789" and name[1] == '.':
             # This is a manifold from the closed hyperbolic census.
             # Its name begins with its volume estimate.
-            return (True, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "msvt" or name[0:2] == "o9":
+            x = (True, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0] in "msvt" or name[0:2] == "o9":
             # This is a manifold from the cusped orientable hyperbolic census.
-            return (True, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "0123456789" and name.split('a')[1][0] == 'h': 
+            x = (True, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0] in "0123456789" and name.split('a')[1][0] == 'h': 
             # This is a hyperbolic manifold from the prime knot census.
-            return (True, "hyp_census: {0}: {1}".format(sig,name))
+            x = (True, "hyp_census: {0}: {1}".format(sig,name))
             
-        if name[0:2] == 'L(':
+        elif name[0:2] == 'L(':
             # A lens space.
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0:3] == 'SFS':
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0:5] == "T x I":
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0:2] == "S3":
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0:3] == "RP3":
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0:7] == "S2 x S1":
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] in "0123456789" and name.split('a')[1][0] != 'h':
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0:3] == 'SFS':
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0:5] == "T x I":
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0:2] == "S3":
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0:3] == "RP3":
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0:7] == "S2 x S1":
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+        elif name[0] in "0123456789" and name.split('a')[1][0] != 'h':
             # This is a nonhyperbolic manifold from the prime knot census.
-            return (False, "hyp_census: {0}: {1}".format(sig,name))
-        if name[0] == 'L' and name[1] in "123456789":
+            x = (False, "hyp_census: {0}: {1}".format(sig,name))
+
+        elif name[0] == 'L' and name[1] in "12345":
             # In the Christy knot and link census.
+            # In this census the first digit is the number of components.
+            # This census goes up to 5 components.
+            # Whence "12345" instead of "0123456789".
+            #
             # This census has both nonhyperbolic and hyperbolic elements.
             # For instance, L108019 is a Seifert-fibered space.
             continue 
+        else:
+            raise Exception("hyp_census: {0}: new name type: " + name)
 
-        raise Exception("hyp_census: {0}: new name type: " + name)
+        if x[0] != None:
+            print(x[1])
+            break
 
-    return (None, "hyp_census: " + sig)
+    return x
 
 def generate_sigs(snappy_mfld, fuel, verbose=False):
     # Regina does this more methodically.
