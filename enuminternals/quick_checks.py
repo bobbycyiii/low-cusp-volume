@@ -43,38 +43,22 @@ def is_common_axis_equation(expr):
     return len(l) == 2
 
 def has_common_axis_obstruction(mfld):
-    """
-    
-    if G.countGenerators() == 2:
-        for i in range(G.countRelations()):
-            if is_common_axis_commutator(G.relation(i)):
-                return True
-            if is_common_axis_equation(G.relation(i)):
-                return True
-    return False
-    """    
     G = mfld.fundamentalGroup()
     G.intelligentSimplify()
     n = G.countGenerators()
-    gen_commute_graph_components = [[i,1] for i in range(n)]
+    CA = {i:set() for i in range(n)}
     for r in G.relations():
         if is_common_axis_commutator(r) or is_common_axis_equation(r):
-            gx = r.generator(0)
-            gy = r.generator(1)
-            unify(gen_commute_graph_components, gx, gy)
-    cpts = [find(gen_commute_graph_components, i) for i in range(n)]
-    return all(cpt == cpts[0] for cpt in cpts)
-    
-def unify(L, u, v):
-    x, y = find(L, u), find(L, v)
-    if x != y:
-        if L[x][1] > L[y][1]:
-            x,y = y,x
-        L[x][0] = y
-        L[y][1] += L[x][1]
-        
-def find(L, u):
-    if L[u][0] != u:
-        L[u][0] = find(L, L[u][0])
-    return L[u][0]
-
+            gx,gy = r.generator(0), r.generator(1)
+            CA[gx].add(gy)
+            CA[gy].add(gx)
+    # CA_P is now in CA represented by adjacency sets.
+    # Now check if CA_P is connected via depth-first search.
+    novel = [True for i in range(n)]
+    def depth_first(x):
+        if novel[x]:
+            novel[x] = False
+            for y in CA[x]:
+                depth_first(y)
+    depth_first(0)
+    return all(not x for x in novel)
