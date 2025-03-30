@@ -38,7 +38,7 @@ def solve_problem_ne(mfld, verbose=False):
     musigs.sort()
     M = regina.Triangulation3(musigs[0][1])
     material_sig = M.isoSig()
-    
+
     if has_common_axis_obstruction(M) or has_common_axis_obstruction(mfld):
         # No nonelementary embeddings.
         if verbose:
@@ -52,12 +52,12 @@ def solve_problem_ne(mfld, verbose=False):
         if verbose:
             print("ne: {0}: strict angle structure".format(sig))
         return set([mu.isoSig()])
-    
+
     nsl = regina.NormalSurfaces
 
     coords = regina.NS_QUAD
     solutions = regina.NS_VERTEX
-    print(f"Enumerating {coords} {solutions} for {material_sig}")
+    print(f"Enumerating {coords} {solutions} for {sig} : {material_sig}")
     F = nsl(M, coords, solutions)
 
     idx = find_from(is_nonseparating_closed_fault, F)
@@ -80,7 +80,7 @@ def solve_problem_ne(mfld, verbose=False):
         if verbose:
             s = "ne: {0} homeo. {1}: reducing S2 at index {2} in {1}"
             print(s.format(sig, material_sig, idx))
-        return solve_problem_ne(L).union(solve_problem_ne(R))
+        return solve_problem_ne(L,verbose).union(solve_problem_ne(R,verbose))
     if verbose:
         print("{} is irreducible".format(material_sig))
 
@@ -100,7 +100,7 @@ def solve_problem_ne(mfld, verbose=False):
         if verbose:
             s = "ne: {0} homeo. {1}: essential T2 at index {2} in {1}"
             print(s.format(sig, material_sig, idx))
-        return solve_problem_ne(L).union(solve_problem_ne(R))
+        return solve_problem_ne(L,verbose).union(solve_problem_ne(R,verbose))
     if verbose:
         print("{} is atoroidal".format(material_sig))
 
@@ -112,7 +112,7 @@ def solve_problem_ne(mfld, verbose=False):
         S = F.surface(idx)
         Mp = S.cutAlong()
         Mp.intelligentSimplify()
-        return solve_problem_ne(Mp)
+        return solve_problem_ne(Mp,verbose)
 
     # At this point, the only possible nonseparating nonclosed fault is an annulus. 
     idx = find_from(is_nonseparating_nonclosed_fault, F)
@@ -121,9 +121,9 @@ def solve_problem_ne(mfld, verbose=False):
             s = "ne: {0} homeo. {1}: nonseparating A2 at index {2} in {1}"
             print(s.format(sig, material_sig, idx))
         S = F.surface(idx)
-        Mp = F.cutAlong()
+        Mp = S.cutAlong()
         Mp.intelligentSimplify()
-        return solve_problem_ne(Mp)
+        return solve_problem_ne(Mp, verbose)
 
     idx = find_from(is_solid_torus_annulus, F)
     if idx != None:
