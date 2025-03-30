@@ -140,6 +140,8 @@ def classify_short_slopes(mfld, cusp, hyps, excs, verbose=False):
 def is_superexceptional(mfld,verbose=False):
     assert mfld.num_cusps() == 1
     assert mfld.is_orientable()
+    if mfld.num_tetrahedra() > 9:
+        print(f"more than 9 tets: {mfld}")
     hyps, excs = set(), set()
     classify_short_slopes(mfld, 0, hyps, excs, verbose=verbose)
     return len(excs) > 8
