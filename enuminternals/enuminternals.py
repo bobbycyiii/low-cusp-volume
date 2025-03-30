@@ -12,7 +12,7 @@ def enumerate_internal_necklaces(bead, verbose=True):
         print("e_i_n, {0} beads: Enumerating isosigs...".format(bead))
     match_sigs = enumerate_isosigs(bead)
     if verbose:
-        print("e_i_n, {0} beads: Running quick checks...".format(bead))
+        print("e_i_n, {0} beads: Getting isosigs for generalized link exteriors with 2 or 3 cusps...".format(bead))
     for match_sig in match_sigs:
         mfld = regina.Triangulation3(match_sig)
         mfld.intelligentSimplify()
