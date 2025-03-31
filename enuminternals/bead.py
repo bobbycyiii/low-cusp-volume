@@ -28,45 +28,27 @@ def make_necklace(match):
             me.join(me_face,you,regina.Perm4(0,1))
     return ndipyr
 
-def smush(l,m):
-    L = list(l)
-    M = list(m)
-    while M != []:
-        L.append(M.pop())
-    return L
-
-def old_for_all_perfect_matchings(p,l,m,f):
-    pfm = old_for_all_perfect_matchings
-    if l == []:
-        if m == []:
-            f(p)
-    elif l[1:] != []:
-        # The head of a Python list is its last element.
-        x0, x1, l2 = l[-1], l[-2], l[:-2]
-        pfm(p+[(x0,x1)], smush(l2,m), [], f)
-        pfm(p, l2+[x0], m+[x1], f)
-
-def for_all_perfect_matchings(p,l,m,f):
-    pfm = for_all_perfect_matchings
-    rv = lambda x: list(reversed(x))
-    x,y = l[-1], l[-2]
-    if len(l) == 2:
-        if m == []:
-            f(p + [(x,y)])
-        else:
-            pfm(p + [(x,y)], rv(m), [], f)
+def pfm(L,R,f):
+    """Do f(L + M) for all perfect matchings M on R."""
+    if R == []:
+        f(L)
     else:
-        pfm(p, l[:-2] + [x], m + [y], f)
-        pfm(p + [(x,y)], rv(m) + l[:-2], [], f)
-            
-    
+        x = R[0]
+        for i in range(1,len(R)):
+            y = R[i]
+            Rpmy = R[1:i] + R[i+1:]
+            pfm(L+[(x,y)], Rpmy, f)
+
+def for_all_perfect_matchings(X, f):
+    pfm([], X, [], f)
+
 def enumerate_isosigs(n):
     labels = list(range(2*n))
     sigs = {}
     def put_in_sigs(p):
         mfld = make_necklace(p)
         sigs[mfld.isoSig()] = p
-    for_all_perfect_matchings([],labels,[],put_in_sigs)
+    for_all_perfect_matchings(labels, put_in_sigs)
     return sigs
 
 import sys
