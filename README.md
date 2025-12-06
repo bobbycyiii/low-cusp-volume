@@ -4,7 +4,7 @@ This repository contains enumeration and hyperbolicity code for the
 paper [*Hyperbolic 3-manifolds of low cusp
 volume*](https://arxiv.org/abs/2109.14570).
 
-`prove_main_theorem.py` proves the main theorem, Theorem 1.1, that
+`provetheorem1p1.py` proves the main theorem, Theorem 1.1, that
 hyperbolic 3-manifolds with an embedded horocusp of volume at most 2.62
 is obtained by filling one of the 16 manifolds listed in the following
 table:
@@ -23,7 +23,7 @@ in the final paper.
 structures of various types with 4 to 7 beads in Remark 5.25 of the
 paper.
 
-`noenum_prove_gordon.py` and `prove_gordon.py` both prove Gordon’s
+`noenum_provegordon.py` and `prove_gordon.py` both prove Gordon’s
 conjecture, Theorem 1.14, that the figure-8 knot exterior is the unique
 1-cusped hyperbolic 3-manifold with nine or more non-hyperbolic
 fillings. `noenum_prove_gordon.py` proves it assuming Theorem 1.1.
@@ -57,10 +57,10 @@ docker run -it --mount type=bind,source="$HOME/low-cusp-volume",target=/home/sag
 
 All the scripts listed above except for `volume_bounds.py` should
 complete under `sage`. For instance, to prove Gordon’s conjecture, run
-`sage prove_gordon.py` after changing directories to the local mount of
+`sage provegordon.py` after changing directories to the local mount of
 this repository.
 
 The `volume_bounds.py` script takes an argument. To prove the first
-claim, run `sage volume_bounds one_cusp`. To prove the second claim, run
-`sage volume_bounds closed`. You can also prove them in one go with
-`sage volume_bounds one_cusp closed`.
+claim, run `sage volume_bounds.py one_cusp`. To prove the second claim, run
+`sage volume_bounds.py closed`. You can also prove them in one go with
+`sage volume_bounds.py one_cusp closed`.
