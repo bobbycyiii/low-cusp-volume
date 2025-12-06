@@ -7,8 +7,8 @@ from enuminternals.ne import find_from
 def hyp_regina(given_sig):
     M = regina.Triangulation3(given_sig)
     M.intelligentSimplify()
-    # Essential vtx surfaces are only guaranteed for material triangulations.
-    # We therefore truncating all ideal vertices, then simplify.
+    # Essential vtx surfaces are only guaranteed in the literature for material triangulations.
+    # We therefore truncate all ideal vertices, then simplify.
     M.idealToFinite()
     M.intelligentSimplify()
     material_sig = M.isoSig()
@@ -241,10 +241,13 @@ def hyp_info(mfld, cusp, slope, verbose=False):
     for sig in sigs:
         reg_N = regina.Triangulation3(sig)
         snp_N = snappy.ManifoldHP(reg_N.snapPea())
-        is_hyp = hyp_snappy(snp_N, verbose)
-        if not is_hyp[0] == None:
-            return is_hyp
-
+        try:
+            is_hyp = hyp_snappy(snp_N, verbose)
+            if not is_hyp[0] == None:
+                return is_hyp
+        except RuntimeError:
+            pass
+        
     sig = sigs[0]
     N = regina.Triangulation3(sig)
     x = hyp_regina(N)

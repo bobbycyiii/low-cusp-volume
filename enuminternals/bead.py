@@ -40,7 +40,7 @@ def pfm(L,R,f):
             pfm(L+[(x,y)], Rpmy, f)
 
 def for_all_perfect_matchings(X, f):
-    pfm([], X, [], f)
+    pfm([], X, f)
 
 def enumerate_isosigs(n):
     labels = list(range(2*n))

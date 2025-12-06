@@ -33,13 +33,38 @@ def solve_problem_ne(mfld, verbose=False):
     for i in range(20):
         mu = regina.Triangulation3(sig)
         mu.idealToFinite()
+        if has_common_axis_obstruction(mu):
+            # No nonelementary embeddings.
+            if verbose:
+                print("ne: {0}: common axis obstruction".format(sig))
+            return set()
         mu.intelligentSimplify()
+        if has_common_axis_obstruction(mu):
+            # No nonelementary embeddings.
+            if verbose:
+                print("ne: {0}: common axis obstruction".format(sig))
+            return set()
         musigs.append((mu.countTetrahedra(),mu.isoSig()))
+        mu.idealToFinite()
+        if has_common_axis_obstruction(mu):
+            # No nonelementary embeddings.
+            if verbose:
+                print("ne: {0}: common axis obstruction".format(sig))
+            return set()
+        mu.intelligentSimplify()
+        if has_common_axis_obstruction(mu):
+            # No nonelementary embeddings.
+            if verbose:
+                print("ne: {0}: common axis obstruction".format(sig))
+            return set()
+
     musigs.sort()
     M = regina.Triangulation3(musigs[0][1])
     material_sig = M.isoSig()
+    mm = regina.Triangulation3(M)
+    mm.finiteToIdeal()
 
-    if has_common_axis_obstruction(M) or has_common_axis_obstruction(mfld):
+    if has_common_axis_obstruction(mfld):
         # No nonelementary embeddings.
         if verbose:
             print("ne: {0}: common axis obstruction".format(sig))
